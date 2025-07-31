@@ -1,0 +1,1 @@
+{ "version": 2, "builds": [{ "src": "product.js", "use": "@vercel/node" }], "rewrites": [{ "source": "/(.*)", "destination": "product.js" }] }

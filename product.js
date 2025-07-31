@@ -11,32 +11,34 @@ const cors = require("cors")
 app.use(cors());
 app.use(express.json());
 
-// Load JSON file
-// const products = JSON.parse(fs.readFileSync("./product.json", "utf-8"));
+//Load JSON file
+const products = JSON.parse(fs.readFileSync("./product.json", "utf-8"));
 
-// const seedProductsData = async () => {
-//     try {
-//       for (const item of products) {
-//         const newEvent = new Product({
-//             name: item.name,
-//             brand: item.brand,
-//             category: item.category,
-//             price: item.price,
-//             rating: item.rating,
-//             image: item.image,
-//             description: item.description
-//         });
-//         await newEvent.save();
-//         //console.log(item.name)
-//       }
+const seedProductsData = async () => {
+  try {
+      await Product.deleteMany({});
+
+      for (const item of products) {
+        const newEvent = new Product({
+            name: item.name,
+            brand: item.brand,
+            category: item.category,
+            price: item.price,
+            rating: item.rating,
+            image: item.image,
+            description: item.description
+        });
+        await newEvent.save();
+        //console.log(item.name)
+      }
     
-//     } catch (error) {
-//       console.error("Error seeding events:", error);
-//     //   process.exit(1);
-//     }
-//   };
+    } catch (error) {
+      console.error("Error seeding events:", error);
+    //   process.exit(1);
+    }
+  };
   
-//   seedProductsData();
+  //seedProductsData();
   
 app.get("/", async (req, res) => {
   try {

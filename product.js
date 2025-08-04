@@ -1,6 +1,7 @@
 const fs = require("fs")
 const { initializeDatabase } = require("./db/db.connect.js")
 const  Product = require("./model/product.model.js")
+const Category = require("./model/category.model.js")
 initializeDatabase()
 
 const express = require("express")
@@ -57,6 +58,29 @@ app.get("/:id", async (req, res) => {
     res.json(product);
   } catch (err) {
     res.status(500).json({ error: "Server Error" });
+  }
+});
+
+
+app.get("/api/categories", async (req, res) => {
+  try {
+    const categories = await Category.find({});
+    res.json({ data: { categories } });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch categories" });
+  }
+});
+
+app.get("/api/categories/:categoryId", async (req, res) => {
+  const { categoryId } = req.params;
+  try {
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+    res.json({ data: { category } });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch category" });
   }
 });
 

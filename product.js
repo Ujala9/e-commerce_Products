@@ -14,33 +14,48 @@ app.use(express.json());
 
 //Load JSON file
 // const products = JSON.parse(fs.readFileSync("./product.json", "utf-8"));
+// const categories = JSON.parse(fs.readFileSync("./categories.json", "utf-8"));
 
-// const seedProductsData = async () => {
-//   try {
-//       await Product.deleteMany({});
+const seedProductsData = async () => {
+  try {
+      await Product.deleteMany({});
 
-//       for (const item of products) {
-//         const newEvent = new Product({
-//             name: item.name,
-//             brand: item.brand,
-//             category: item.category,
-//             price: item.price,
-//             rating: item.rating,
-//             image: item.image,
-//             description: item.description
-//         });
-//         await newEvent.save();
-//         //console.log(item.name)
-//       }
+      for (const item of products) {
+        const newEvent = new Product({
+            name: item.name,
+            brand: item.brand,
+            category: item.category,
+            price: item.price,
+            rating: item.rating,
+            image: item.image,
+            description: item.description
+        });
+        await newEvent.save();
+        //console.log(item.name)
+      }
     
-//     } catch (error) {
-//       console.error("Error seeding events:", error);
-//     //   process.exit(1);
-//     }
-//   };
+    } catch (error) {
+      console.error("Error seeding events:", error);
+    //   process.exit(1);
+    }
+  };
   
-// this function is to seed data
-  //seedProductsData();
+//this function is to seed data
+ //seedProductsData();
+
+ const seedCategories = async () => {
+  try {
+    //await Category.deleteMany({});
+    await Category.insertMany(categories);
+    console.log("Categories seeded");
+    process.exit();
+  } catch (err) {
+    console.error("Error seeding categories:", err);
+    process.exit(1);
+  }
+};
+
+//seedCategories();
   
 app.get("/", async (req, res) => {
   try {
@@ -65,7 +80,7 @@ app.get("/:id", async (req, res) => {
 app.get("/api/categories", async (req, res) => {
   try {
     const categories = await Category.find({});
-    res.json({ data: { categories } });
+   res.json(categories);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch categories" });
   }
@@ -78,7 +93,7 @@ app.get("/api/categories/:categoryId", async (req, res) => {
     if (!category) {
       return res.status(404).json({ error: "Category not found" });
     }
-    res.json({ data: { category } });
+    res.json(category);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch category" });
   }

@@ -18,30 +18,37 @@ app.use(express.json());
 
 const seedProductsData = async () => {
   try {
-      await Product.deleteMany({});
+    await Product.deleteMany({});
 
-      for (const item of products) {
-        const newEvent = new Product({
-            name: item.name,
-            brand: item.brand,
-            category: item.category,
-            price: item.price,
-            rating: item.rating,
-            image: item.image,
-            description: item.description
-        });
-        await newEvent.save();
-        //console.log(item.name)
+    for (const item of products) {
+      // Find the category ObjectId from the Category collection
+      const categoryDoc = await Category.findOne({ name: item.category });
+
+      if (!categoryDoc) {
+        console.warn(`Category "${item.category}" not found for product "${item.name}"`);
+        continue; // Skip this product if no matching category found
       }
-    
-    } catch (error) {
-      console.error("Error seeding events:", error);
-    //   process.exit(1);
+
+      const newProduct = new Product({
+        name: item.name,
+        brand: item.brand,
+        category: categoryDoc._id, // Use referenced ObjectId
+        price: item.price,
+        rating: item.rating,
+        image: item.image,
+        description: item.description
+      });
+
+      await newProduct.save();
     }
-  };
-  
-//this function is to seed data
- //seedProductsData();
+
+    console.log("Products seeded");
+  } catch (error) {
+    console.error("Error seeding products:", error);
+  }
+};
+
+//seedProductsData()
 
  const seedCategories = async () => {
   try {
@@ -59,7 +66,8 @@ const seedProductsData = async () => {
   
 app.get("/", async (req, res) => {
   try {
-    const products = await Product.find({});
+    const products = await Product.find({}).populate("category");
+
     res.json(products);
   } catch (err) {
     res.status(500).json({ error: "Server Error" });

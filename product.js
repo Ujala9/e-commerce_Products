@@ -13,8 +13,8 @@ app.use(cors());
 app.use(express.json());
 
 //Load JSON file
-// const products = JSON.parse(fs.readFileSync("./product.json", "utf-8"));
-// const categories = JSON.parse(fs.readFileSync("./categories.json", "utf-8"));
+//const products = JSON.parse(fs.readFileSync("./product.json", "utf-8"));
+//const categories = JSON.parse(fs.readFileSync("./categories.json", "utf-8"));
 
 const seedProductsData = async () => {
   try {
@@ -52,7 +52,7 @@ const seedProductsData = async () => {
 
  const seedCategories = async () => {
   try {
-    //await Category.deleteMany({});
+    await Category.deleteMany({});
     await Category.insertMany(categories);
     console.log("Categories seeded");
     process.exit();
@@ -70,6 +70,7 @@ app.get("/", async (req, res) => {
 
     res.json(products);
   } catch (err) {
+    console.error("Error in GET / route:", err); 
     res.status(500).json({ error: "Server Error" });
   }
 });

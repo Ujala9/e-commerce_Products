@@ -2,6 +2,7 @@ const fs = require("fs")
 const { initializeDatabase } = require("./db/db.connect.js")
 const  Product = require("./model/product.model.js")
 const Category = require("./model/category.model.js")
+const Cart =  require("./model/cart.model.js")
 initializeDatabase()
 
 const express = require("express")
@@ -106,6 +107,27 @@ app.get("/api/categories/:categoryId", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch category" });
   }
+});
+
+app.post("/:cartId", async (req, res) => {
+  const { productId, quantity } = req.body;
+
+  let cart = await Cart.findOne({ cartId: req.params.cartId });
+
+  if (!cart) {
+    cart = new Cart({ cartId: req.params.cartId, items: [{ productId, quantity }] });
+  } else {
+    const existingItem = cart.items.find(item => item.productId.toString() === productId);
+    if (existingItem) {
+      existingItem.quantity += quantity;
+    } else {
+      cart.items.push({ productId, quantity });
+    }
+  }
+
+  await cart.save();
+  const updatedCart = await Cart.findOne({ cartId: req.params.cartId }).populate("items.productId");
+  res.json(updatedCart);
 });
 
 

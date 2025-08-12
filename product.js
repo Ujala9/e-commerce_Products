@@ -109,7 +109,7 @@ app.get("/api/categories/:categoryId", async (req, res) => {
   }
 });
 
-app.post("/:cartId", async (req, res) => {
+app.post("/cart/:cartId", async (req, res) => {
   const { productId, quantity } = req.body;
 
   let cart = await Cart.findOne({ cartId: req.params.cartId });
@@ -130,9 +130,20 @@ app.post("/:cartId", async (req, res) => {
   res.json(updatedCart);
 });
 
+app.get("/cart/:cartId", async (req, res) => {
+  const cart = await Cart.findOne({ cartId: req.params.cartId }).populate("items.productId");
+  res.json(cart || { cartId: req.params.cartId, items: [] });
+});
 
+// Remove item from cart
+app.delete("/cart/:cartId/:productId", async (req, res) => {
+  await Cart.updateOne(
+    { cartId: req.params.cartId },
+    { $pull: { items: { productId: req.params.productId } } }
+)
+})
 
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-});
+})
